@@ -13,7 +13,8 @@ class Image_Wiget extends StatelessWidget{
       borderRadius: BorderRadius.circular(16),
       child: Image.network(
         link,
-        fit: BoxFit.cover,
+        height: 100,
+        fit: BoxFit.contain,
       ),
     );
   }
