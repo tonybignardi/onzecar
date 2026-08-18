@@ -93,7 +93,9 @@ class _CarCadastroPageState extends State<CarCadastroPage> {
         title: const Text('Entre em contato'),
       ),
 
-      body: Form(
+      body: Card(
+        elevation: 5,
+        child:  Form(
         key: _formchave,
 
         child: SingleChildScrollView(
@@ -291,23 +293,6 @@ class _CarCadastroPageState extends State<CarCadastroPage> {
 
               const SizedBox(height: 30),
 
-              // =========================
-              // PROPOSTA
-              // =========================
-
-              TextFormField(
-                controller: mensagemController,
-                maxLines: 10,
-                decoration: const InputDecoration(
-                  labelText: 'Sua proposta *',
-                  alignLabelWithHint: true,
-                ),
-                validator: (v) =>
-                    validacao(v, 'Digite sua proposta'),
-              ),
-
-              const SizedBox(height: 24),
-
               // Botão de envio
               SizedBox(
                 width: double.infinity,
@@ -316,7 +301,7 @@ class _CarCadastroPageState extends State<CarCadastroPage> {
                   child: Text(
                     enviado
                         ? 'Enviado'
-                        : 'Enviar Proposta',
+                        : 'Enviar',
                   ),
                 ),
               ),
@@ -324,6 +309,7 @@ class _CarCadastroPageState extends State<CarCadastroPage> {
           ),
         ),
       ),
+      )  
     );
   }
 }
