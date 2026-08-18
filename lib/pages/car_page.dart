@@ -1,4 +1,4 @@
-import 'package:appcarro/pages/car_page_widgets/Castro_page.dart';
+import 'package:appcarro/pages/car_page_widgets/Cadastro_page.dart';
 import 'package:appcarro/pages/car_page_widgets/Dados_page.dart';
 import 'package:appcarro/pages/car_page_widgets/Detalhe_page.dart';
 import 'package:appcarro/pages/car_page_widgets/Preco_page.dart';
