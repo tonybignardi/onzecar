@@ -3,6 +3,8 @@ import 'package:appcarro/pages/home_page.dart';
 import 'package:appcarro/pages/category_page.dart';
 import 'package:appcarro/pages/store_page.dart';
 import 'package:appcarro/pages/car_page.dart';
+import 'package:appcarro/pages/brand_page.dart';
+import 'package:appcarro/models.dart';
 
 void main() {
   runApp(const MainApp());
@@ -31,15 +33,20 @@ class AppHomeScreen extends StatefulWidget {
 
 class _AppHomeScreenState extends State<AppHomeScreen> {
   int _selectedIndex = 0;
+  final List<Category> _categories = [];
+  final List<Brand> _brands = [];
+  final List<Store> _stores = [];
+  final List<Car> _cars = [];
 
-  final List<Widget> _pages = [
-    const HomePage(),
-    const CategoryPage(),
-    const StorePage(),
-    const CarPage(),
-  ];
+  List<String> get _titles => ['elevenCar', 'Categorias', 'Marcas', 'Lojas', 'Carros'];
 
-  final List<String> _titles = ['elevenCar', 'Categorias', 'Lojas', 'Carros'];
+  List<Widget> get _pages => [
+        const HomePage(),
+        CategoryPage(categories: _categories),
+        BrandPage(brands: _brands),
+        StorePage(stores: _stores),
+        CarPage(cars: _cars, categories: _categories, brands: _brands, stores: _stores),
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -93,8 +100,8 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.store),
-              title: const Text('Loja'),
+              leading: const Icon(Icons.sell),
+              title: const Text('Marcas'),
               selected: _selectedIndex == 2,
               onTap: () {
                 setState(() => _selectedIndex = 2);
@@ -102,11 +109,20 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.directions_car),
-              title: const Text('Carro'),
+              leading: const Icon(Icons.store),
+              title: const Text('Lojas'),
               selected: _selectedIndex == 3,
               onTap: () {
                 setState(() => _selectedIndex = 3);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.directions_car),
+              title: const Text('Carros'),
+              selected: _selectedIndex == 4,
+              onTap: () {
+                setState(() => _selectedIndex = 4);
                 Navigator.pop(context);
               },
             ),
