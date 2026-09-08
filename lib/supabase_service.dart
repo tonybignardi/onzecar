@@ -7,34 +7,34 @@ class SupabaseService {
   static final client = Supabase.instance.client;
 
   static Future<List<Category>> categories(String user) async {
-    final rows = await client.from('categorias').select().eq('usuario', user).order('nome');
+    final rows = await client.from('categoria').select().eq('usuario', user).order('nome');
     return rows.map((row) => Category(id: row['id'] as int?, name: row['nome'] as String, description: row['descricao'] as String)).toList();
   }
 
   static Future<void> addCategory(String user, Category item) async {
-    await client.from('categorias').insert({'nome': item.name, 'descricao': item.description, 'usuario': user});
+    await client.from('categoria').insert({'nome': item.name, 'descricao': item.description, 'usuario': user});
   }
 
   static Future<List<Brand>> brands(String user) async {
-    final rows = await client.from('marcas').select().eq('usuario', user).order('nome');
+    final rows = await client.from('marca').select().eq('usuario', user).order('nome');
     return rows.map((row) => Brand(id: row['id'] as int?, name: row['nome'] as String, country: row['pais'] as String)).toList();
   }
 
   static Future<void> addBrand(String user, Brand item) async {
-    await client.from('marcas').insert({'nome': item.name, 'pais': item.country, 'usuario': user});
+    await client.from('marca').insert({'nome': item.name, 'pais': item.country, 'usuario': user});
   }
 
   static Future<List<Store>> stores(String user) async {
-    final rows = await client.from('lojas').select().eq('usuario', user).order('nome');
+    final rows = await client.from('loja').select().eq('usuario', user).order('nome');
     return rows.map((row) => Store(id: row['id'] as int?, name: row['nome'] as String, city: row['cidade'] as String, address: row['endereco'] as String, phone: row['telefone'] as String)).toList();
   }
 
   static Future<void> addStore(String user, Store item) async {
-    await client.from('lojas').insert({'nome': item.name, 'cidade': item.city, 'endereco': item.address, 'telefone': item.phone, 'usuario': user});
+    await client.from('loja').insert({'nome': item.name, 'cidade': item.city, 'endereco': item.address, 'telefone': item.phone, 'usuario': user});
   }
 
   static Future<void> addCar(String user, Car item) async {
-    await client.from('carros').insert({
+    await client.from('carro').insert({
       'modelo': item.model,
       'ano': item.year,
       'cor': item.color,
@@ -53,7 +53,7 @@ class SupabaseService {
     List<Brand> brands,
     List<Store> stores,
   ) async {
-    final rows = await client.from('carros').select().eq('usuario', user).order('modelo');
+    final rows = await client.from('carro').select().eq('usuario', user).order('modelo');
     return rows.map((row) {
       final category = categories.firstWhere((item) => item.id == row['categoria_id']);
       final brand = brands.firstWhere((item) => item.id == row['marca_id']);
