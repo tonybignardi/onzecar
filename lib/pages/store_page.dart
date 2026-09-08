@@ -54,10 +54,10 @@ class _StorePageState extends State<StorePage> {
     if ([name, city, address, phone].any((value) => value.isEmpty)) return;
 
     final store = Store(name: name, city: city, address: address, phone: phone);
-    SupabaseService.addStore(widget.nickname!, store).then((_) {
+    SupabaseService.addStore(widget.nickname!, store).then((savedStore) {
       if (!mounted) return;
       setState(() {
-        widget.stores.add(store);
+        widget.stores.add(savedStore);
       _nameController.clear();
       _cityController.clear();
       _addressController.clear();

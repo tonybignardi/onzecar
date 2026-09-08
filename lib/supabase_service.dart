@@ -11,8 +11,17 @@ class SupabaseService {
     return rows.map((row) => Category(id: row['id'] as int?, name: row['nome'] as String, description: row['descricao'] as String)).toList();
   }
 
-  static Future<void> addCategory(String user, Category item) async {
-    await client.from('categoria').insert({'nome': item.name, 'descricao': item.description, 'usuario': user});
+  static Future<Category> addCategory(String user, Category item) async {
+    final row = await client.from('categoria').insert({
+      'nome': item.name,
+      'descricao': item.description,
+      'usuario': user,
+    }).select().single();
+    return Category(
+      id: row['id'] as int,
+      name: row['nome'] as String,
+      description: row['descricao'] as String,
+    );
   }
 
   static Future<List<Brand>> brands(String user) async {
@@ -20,8 +29,17 @@ class SupabaseService {
     return rows.map((row) => Brand(id: row['id'] as int?, name: row['nome'] as String, country: row['pais'] as String)).toList();
   }
 
-  static Future<void> addBrand(String user, Brand item) async {
-    await client.from('marca').insert({'nome': item.name, 'pais': item.country, 'usuario': user});
+  static Future<Brand> addBrand(String user, Brand item) async {
+    final row = await client.from('marca').insert({
+      'nome': item.name,
+      'pais': item.country,
+      'usuario': user,
+    }).select().single();
+    return Brand(
+      id: row['id'] as int,
+      name: row['nome'] as String,
+      country: row['pais'] as String,
+    );
   }
 
   static Future<List<Store>> stores(String user) async {
@@ -29,11 +47,27 @@ class SupabaseService {
     return rows.map((row) => Store(id: row['id'] as int?, name: row['nome'] as String, city: row['cidade'] as String, address: row['endereco'] as String, phone: row['telefone'] as String)).toList();
   }
 
-  static Future<void> addStore(String user, Store item) async {
-    await client.from('loja').insert({'nome': item.name, 'cidade': item.city, 'endereco': item.address, 'telefone': item.phone, 'usuario': user});
+  static Future<Store> addStore(String user, Store item) async {
+    final row = await client.from('loja').insert({
+      'nome': item.name,
+      'cidade': item.city,
+      'endereco': item.address,
+      'telefone': item.phone,
+      'usuario': user,
+    }).select().single();
+    return Store(
+      id: row['id'] as int,
+      name: row['nome'] as String,
+      city: row['cidade'] as String,
+      address: row['endereco'] as String,
+      phone: row['telefone'] as String,
+    );
   }
 
   static Future<void> addCar(String user, Car item) async {
+    if (item.category.id == null || item.brand.id == null || item.store.id == null) {
+      throw ArgumentError('Categoria, marca e loja precisam ter IDs cadastrados.');
+    }
     await client.from('carro').insert({
       'modelo': item.model,
       'ano': item.year,

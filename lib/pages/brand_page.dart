@@ -48,10 +48,10 @@ class _BrandPageState extends State<BrandPage> {
     if (name.isEmpty || country.isEmpty) return;
 
     final brand = Brand(name: name, country: country);
-    SupabaseService.addBrand(widget.nickname!, brand).then((_) {
+    SupabaseService.addBrand(widget.nickname!, brand).then((savedBrand) {
       if (!mounted) return;
       setState(() {
-        widget.brands.add(brand);
+        widget.brands.add(savedBrand);
       _nameController.clear();
       _countryController.clear();
       });

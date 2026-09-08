@@ -50,10 +50,10 @@ class _CategoryPageState extends State<CategoryPage> {
     }
 
     final category = Category(name: name, description: description);
-    SupabaseService.addCategory(widget.nickname!, category).then((_) {
+    SupabaseService.addCategory(widget.nickname!, category).then((savedCategory) {
       if (!mounted) return;
       setState(() {
-        widget.categories.add(category);
+        widget.categories.add(savedCategory);
         _nameController.clear();
         _descriptionController.clear();
       });

@@ -85,6 +85,10 @@ class _CarPageState extends State<CarPage> {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Preencha todos os campos do carro.')));
       return;
     }
+    if (_category!.id == null || _brand!.id == null || _store!.id == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cadastre categoria, marca e loja no banco antes de cadastrar o carro.')));
+      return;
+    }
 
     final car = Car(
         model: _modelController.text.trim(),
