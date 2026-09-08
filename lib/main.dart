@@ -14,7 +14,7 @@ const supabasePublishableKey = 'sb_publishable_a5TsScC6FwjjR_RNsiDJiA_ufslFAlG';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Supabase.initialize(url: supabaseUrl, publishableKey: supabasePublishableKey);
+  await Supabase.initialize(url: supabaseUrl, anonKey: supabasePublishableKey);
   final preferences = await SharedPreferences.getInstance();
   final nickname = preferences.getString('nickname');
   runApp(MainApp(initialNickname: nickname));
