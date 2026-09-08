@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:appcarro/models.dart';
+import 'package:appcarro/supabase_service.dart';
 
 class CategoryPage extends StatefulWidget {
-  const CategoryPage({super.key, required this.categories});
+  const CategoryPage({super.key, required this.categories, required this.nickname});
 
   final List<Category> categories;
+  final String? nickname;
 
   @override
   State<CategoryPage> createState() => _CategoryPageState();
@@ -15,6 +17,21 @@ class _CategoryPageState extends State<CategoryPage> {
   final TextEditingController _descriptionController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.nickname != null) _loadCategories();
+  }
+
+  Future<void> _loadCategories() async {
+    try {
+      final items = await SupabaseService.categories(widget.nickname!);
+      if (mounted) setState(() { widget.categories..clear()..addAll(items); });
+    } catch (error) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao carregar categorias: $error')));
+    }
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
@@ -22,16 +39,26 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   void _addCategory() {
+    if (widget.nickname == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Defina o nickname do usuário primeiro.')));
+      return;
+    }
     final name = _nameController.text.trim();
     final description = _descriptionController.text.trim();
     if (name.isEmpty || description.isEmpty) {
       return;
     }
 
-    setState(() {
-      widget.categories.add(Category(name: name, description: description));
-      _nameController.clear();
-      _descriptionController.clear();
+    final category = Category(name: name, description: description);
+    SupabaseService.addCategory(widget.nickname!, category).then((_) {
+      if (!mounted) return;
+      setState(() {
+        widget.categories.add(category);
+        _nameController.clear();
+        _descriptionController.clear();
+      });
+    }).catchError((error) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao salvar categoria: $error')));
     });
   }
 

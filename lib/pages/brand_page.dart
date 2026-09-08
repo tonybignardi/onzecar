@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:appcarro/models.dart';
+import 'package:appcarro/supabase_service.dart';
 
 class BrandPage extends StatefulWidget {
-  const BrandPage({super.key, required this.brands});
+  const BrandPage({super.key, required this.brands, required this.nickname});
 
   final List<Brand> brands;
+  final String? nickname;
 
   @override
   State<BrandPage> createState() => _BrandPageState();
@@ -15,6 +17,21 @@ class _BrandPageState extends State<BrandPage> {
   final _countryController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.nickname != null) _loadBrands();
+  }
+
+  Future<void> _loadBrands() async {
+    try {
+      final items = await SupabaseService.brands(widget.nickname!);
+      if (mounted) setState(() { widget.brands..clear()..addAll(items); });
+    } catch (error) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao carregar marcas: $error')));
+    }
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _countryController.dispose();
@@ -22,14 +39,24 @@ class _BrandPageState extends State<BrandPage> {
   }
 
   void _addBrand() {
+    if (widget.nickname == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Defina o nickname do usuário primeiro.')));
+      return;
+    }
     final name = _nameController.text.trim();
     final country = _countryController.text.trim();
     if (name.isEmpty || country.isEmpty) return;
 
-    setState(() {
-      widget.brands.add(Brand(name: name, country: country));
+    final brand = Brand(name: name, country: country);
+    SupabaseService.addBrand(widget.nickname!, brand).then((_) {
+      if (!mounted) return;
+      setState(() {
+        widget.brands.add(brand);
       _nameController.clear();
       _countryController.clear();
+      });
+    }).catchError((error) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao salvar marca: $error')));
     });
   }
 

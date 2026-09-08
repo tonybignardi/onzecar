@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:appcarro/models.dart';
+import 'package:appcarro/supabase_service.dart';
 
 class StorePage extends StatefulWidget {
-  const StorePage({super.key, required this.stores});
+  const StorePage({super.key, required this.stores, required this.nickname});
 
   final List<Store> stores;
+  final String? nickname;
 
   @override
   State<StorePage> createState() => _StorePageState();
@@ -17,6 +19,21 @@ class _StorePageState extends State<StorePage> {
   final _phoneController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.nickname != null) _loadStores();
+  }
+
+  Future<void> _loadStores() async {
+    try {
+      final items = await SupabaseService.stores(widget.nickname!);
+      if (mounted) setState(() { widget.stores..clear()..addAll(items); });
+    } catch (error) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao carregar lojas: $error')));
+    }
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _cityController.dispose();
@@ -26,18 +43,28 @@ class _StorePageState extends State<StorePage> {
   }
 
   void _addStore() {
+    if (widget.nickname == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Defina o nickname do usuário primeiro.')));
+      return;
+    }
     final name = _nameController.text.trim();
     final city = _cityController.text.trim();
     final address = _addressController.text.trim();
     final phone = _phoneController.text.trim();
     if ([name, city, address, phone].any((value) => value.isEmpty)) return;
 
-    setState(() {
-      widget.stores.add(Store(name: name, city: city, address: address, phone: phone));
+    final store = Store(name: name, city: city, address: address, phone: phone);
+    SupabaseService.addStore(widget.nickname!, store).then((_) {
+      if (!mounted) return;
+      setState(() {
+        widget.stores.add(store);
       _nameController.clear();
       _cityController.clear();
       _addressController.clear();
       _phoneController.clear();
+      });
+    }).catchError((error) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao salvar loja: $error')));
     });
   }
 

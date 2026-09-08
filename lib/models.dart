@@ -1,25 +1,29 @@
 class Category {
-  Category({required this.name, required this.description});
+  Category({this.id, required this.name, required this.description});
 
+  final int? id;
   final String name;
   final String description;
 }
 
 class Brand {
-  Brand({required this.name, required this.country});
+  Brand({this.id, required this.name, required this.country});
 
+  final int? id;
   final String name;
   final String country;
 }
 
 class Store {
   Store({
+    this.id,
     required this.name,
     required this.city,
     required this.address,
     required this.phone,
   });
 
+  final int? id;
   final String name;
   final String city;
   final String address;
@@ -28,6 +32,7 @@ class Store {
 
 class Car {
   Car({
+    this.id,
     required this.model,
     required this.year,
     required this.color,
@@ -38,6 +43,7 @@ class Car {
     required this.store,
   });
 
+  final int? id;
   final String model;
   final int year;
   final String color;

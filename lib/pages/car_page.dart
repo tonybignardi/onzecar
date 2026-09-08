@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:appcarro/models.dart';
+import 'package:appcarro/supabase_service.dart';
 
 class CarPage extends StatefulWidget {
   const CarPage({
@@ -8,12 +9,14 @@ class CarPage extends StatefulWidget {
     required this.categories,
     required this.brands,
     required this.stores,
+    required this.nickname,
   });
 
   final List<Car> cars;
   final List<Category> categories;
   final List<Brand> brands;
   final List<Store> stores;
+  final String? nickname;
 
   @override
   State<CarPage> createState() => _CarPageState();
@@ -30,6 +33,30 @@ class _CarPageState extends State<CarPage> {
   Store? _store;
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.nickname != null) _loadCars();
+  }
+
+  Future<void> _loadCars() async {
+    try {
+      final categories = await SupabaseService.categories(widget.nickname!);
+      final brands = await SupabaseService.brands(widget.nickname!);
+      final stores = await SupabaseService.stores(widget.nickname!);
+      final cars = await SupabaseService.cars(widget.nickname!, categories, brands, stores);
+      if (!mounted) return;
+      setState(() {
+        widget.categories..clear()..addAll(categories);
+        widget.brands..clear()..addAll(brands);
+        widget.stores..clear()..addAll(stores);
+        widget.cars..clear()..addAll(cars);
+      });
+    } catch (error) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao carregar carros: $error')));
+    }
+  }
+
+  @override
   void dispose() {
     _modelController.dispose();
     _yearController.dispose();
@@ -40,6 +67,10 @@ class _CarPageState extends State<CarPage> {
   }
 
   void _saveCar() {
+    if (widget.nickname == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Defina o nickname do usuário primeiro.')));
+      return;
+    }
     final year = int.tryParse(_yearController.text.trim());
     final price = double.tryParse(_priceController.text.trim().replaceAll(',', '.'));
     final mileage = int.tryParse(_mileageController.text.trim());
@@ -55,8 +86,7 @@ class _CarPageState extends State<CarPage> {
       return;
     }
 
-    setState(() {
-      widget.cars.add(Car(
+    final car = Car(
         model: _modelController.text.trim(),
         year: year,
         color: _colorController.text.trim(),
@@ -65,14 +95,21 @@ class _CarPageState extends State<CarPage> {
         category: _category!,
         brand: _brand!,
         store: _store!,
-      ));
-      _modelController.clear();
-      _yearController.clear();
-      _colorController.clear();
-      _priceController.clear();
-      _mileageController.clear();
+      );
+    SupabaseService.addCar(widget.nickname!, car).then((_) {
+      if (!mounted) return;
+      setState(() {
+        widget.cars.add(car);
+        _modelController.clear();
+        _yearController.clear();
+        _colorController.clear();
+        _priceController.clear();
+        _mileageController.clear();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Carro cadastrado com sucesso!')));
+    }).catchError((error) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao salvar carro: $error')));
     });
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Carro cadastrado com sucesso!')));
   }
 
   InputDecoration _decoration(String label, IconData icon) => InputDecoration(labelText: label, border: const OutlineInputBorder(), prefixIcon: Icon(icon));
