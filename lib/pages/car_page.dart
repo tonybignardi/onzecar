@@ -38,6 +38,17 @@ class _CarPageState extends State<CarPage> {
     if (widget.nickname != null) _loadCars();
   }
 
+  @override
+  void didUpdateWidget(covariant CarPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.nickname != oldWidget.nickname && widget.nickname != null) {
+      _category = null;
+      _brand = null;
+      _store = null;
+      _loadCars();
+    }
+  }
+
   Future<void> _loadCars() async {
     try {
       final categories = await SupabaseService.categories(widget.nickname!);

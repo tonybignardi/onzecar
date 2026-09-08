@@ -22,6 +22,14 @@ class _BrandPageState extends State<BrandPage> {
     if (widget.nickname != null) _loadBrands();
   }
 
+  @override
+  void didUpdateWidget(covariant BrandPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.nickname != oldWidget.nickname && widget.nickname != null) {
+      _loadBrands();
+    }
+  }
+
   Future<void> _loadBrands() async {
     try {
       final items = await SupabaseService.brands(widget.nickname!);

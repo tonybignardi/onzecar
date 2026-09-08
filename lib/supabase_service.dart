@@ -6,9 +6,20 @@ class SupabaseService {
 
   static final client = Supabase.instance.client;
 
+  static int? _id(Map<String, dynamic> row, List<String> names) {
+    for (final name in names) {
+      final value = row[name];
+      if (value is int) return value;
+      if (value is num) return value.toInt();
+      final parsed = int.tryParse('$value');
+      if (parsed != null) return parsed;
+    }
+    return null;
+  }
+
   static Future<List<Category>> categories(String user) async {
     final rows = await client.from('categoria').select().eq('usuario', user).order('nome');
-    return rows.map((row) => Category(id: row['id'] as int?, name: row['nome'] as String, description: row['descricao'] as String)).toList();
+    return rows.map((row) => Category(id: _id(row, ['id', 'categoria_id', 'id_categoria']), name: row['nome'] as String, description: row['descricao'] as String)).toList();
   }
 
   static Future<Category> addCategory(String user, Category item) async {
@@ -18,7 +29,7 @@ class SupabaseService {
       'usuario': user,
     }).select().single();
     return Category(
-      id: row['id'] as int,
+      id: _id(row, ['id', 'categoria_id', 'id_categoria'])!,
       name: row['nome'] as String,
       description: row['descricao'] as String,
     );
@@ -26,7 +37,7 @@ class SupabaseService {
 
   static Future<List<Brand>> brands(String user) async {
     final rows = await client.from('marca').select().eq('usuario', user).order('nome');
-    return rows.map((row) => Brand(id: row['id'] as int?, name: row['nome'] as String, country: row['pais'] as String)).toList();
+    return rows.map((row) => Brand(id: _id(row, ['id', 'marca_id', 'id_marca']), name: row['nome'] as String, country: row['pais'] as String)).toList();
   }
 
   static Future<Brand> addBrand(String user, Brand item) async {
@@ -36,7 +47,7 @@ class SupabaseService {
       'usuario': user,
     }).select().single();
     return Brand(
-      id: row['id'] as int,
+      id: _id(row, ['id', 'marca_id', 'id_marca'])!,
       name: row['nome'] as String,
       country: row['pais'] as String,
     );
@@ -44,7 +55,7 @@ class SupabaseService {
 
   static Future<List<Store>> stores(String user) async {
     final rows = await client.from('loja').select().eq('usuario', user).order('nome');
-    return rows.map((row) => Store(id: row['id'] as int?, name: row['nome'] as String, city: row['cidade'] as String, address: row['endereco'] as String, phone: row['telefone'] as String)).toList();
+    return rows.map((row) => Store(id: _id(row, ['id', 'loja_id', 'id_loja']), name: row['nome'] as String, city: row['cidade'] as String, address: row['endereco'] as String, phone: row['telefone'] as String)).toList();
   }
 
   static Future<Store> addStore(String user, Store item) async {
@@ -56,7 +67,7 @@ class SupabaseService {
       'usuario': user,
     }).select().single();
     return Store(
-      id: row['id'] as int,
+      id: _id(row, ['id', 'loja_id', 'id_loja'])!,
       name: row['nome'] as String,
       city: row['cidade'] as String,
       address: row['endereco'] as String,
@@ -93,7 +104,7 @@ class SupabaseService {
       final brand = brands.firstWhere((item) => item.id == row['marca_id']);
       final store = stores.firstWhere((item) => item.id == row['loja_id']);
       return Car(
-        id: row['id'] as int?,
+        id: _id(row, ['id', 'carro_id', 'id_carro']),
         model: row['modelo'] as String,
         year: row['ano'] as int,
         color: row['cor'] as String,

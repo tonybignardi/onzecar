@@ -22,6 +22,14 @@ class _CategoryPageState extends State<CategoryPage> {
     if (widget.nickname != null) _loadCategories();
   }
 
+  @override
+  void didUpdateWidget(covariant CategoryPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.nickname != oldWidget.nickname && widget.nickname != null) {
+      _loadCategories();
+    }
+  }
+
   Future<void> _loadCategories() async {
     try {
       final items = await SupabaseService.categories(widget.nickname!);

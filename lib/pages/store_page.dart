@@ -24,6 +24,14 @@ class _StorePageState extends State<StorePage> {
     if (widget.nickname != null) _loadStores();
   }
 
+  @override
+  void didUpdateWidget(covariant StorePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.nickname != oldWidget.nickname && widget.nickname != null) {
+      _loadStores();
+    }
+  }
+
   Future<void> _loadStores() async {
     try {
       final items = await SupabaseService.stores(widget.nickname!);
